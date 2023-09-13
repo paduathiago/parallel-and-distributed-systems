@@ -91,13 +91,13 @@ int main()
     {
 
         // Process the first part of the input
-        printf("\ntid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
+        //printf("\ntid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
         
         int num_resources = 0;
         
         do { 
             scanf("%d%c", &requested_resources[num_resources], &new_char);
-            printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
+            //printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
             num_resources++; 
         } while(new_char != '\n'); 
 
