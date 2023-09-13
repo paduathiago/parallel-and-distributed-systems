@@ -15,14 +15,38 @@ typedef struct
 typedef struct
 {
     pthread_mutex_t mutex;
+    pthread_cond_t cond;
     bool available[8];
 } Resources;
+
+bool requested_available(Thread *thread, Resources *resources)
+{
+    for (int i = 0; i < thread->num_resources; i++)
+        if (!resources->available[thread->resources[i]])
+            return false;
+    return true;
+}
 
 void init_resources(Resources *resources)
 {
     pthread_mutex_init(&resources->mutex, NULL);
+    pthread_cond_init(&resources->cond, NULL);
+
     for (int i = 0; i < 8; i++)
         resources->available[i] = true;
+}
+
+void lock_resources(Thread *thread, Resources *resources)
+{
+    pthread_mutex_lock(&resources->mutex);
+    
+    while (!requested_available(thread, resources))
+        pthread_cond_wait(&resources->cond, &resources->mutex);
+    
+    for(int i = 0; i < thread->num_resources; i++)
+        resources->available[thread->resources[i]] = false;
+    
+    pthread_mutex_unlock(&resources->mutex);
 }
 
 void free_resources(Thread *thread, Resources *resources)
@@ -60,7 +84,7 @@ int main()
         // Process the second part of the input (requested resources)
         Thread thread = {tid, free_time, critical_time, requested_resources, num_resources};
 
-        
+
         // while ((ch = getchar()) != '\n' && ch != EOF);
     }
     printf("Im out\n");
