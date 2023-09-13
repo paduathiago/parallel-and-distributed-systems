@@ -22,8 +22,10 @@ typedef struct
 bool requested_available(Thread *thread, Resources *resources)
 {
     for (int i = 0; i < thread->num_resources; i++)
+    {
         if (!resources->available[thread->resources[i]])
             return false;
+    }
     return true;
 }
 
