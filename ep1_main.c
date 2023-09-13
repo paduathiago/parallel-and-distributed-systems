@@ -10,17 +10,27 @@ typedef struct
     int critical_time;
     int resources[8];
     int num_resources;
-} Task;
+} Thread;
 
 typedef struct
 {
+    pthread_mutex_t mutex;
     bool available[8];
 } Resources;
 
 void init_resources(Resources *resources)
 {
+    pthread_mutex_init(&resources->mutex, NULL);
     for (int i = 0; i < 8; i++)
         resources->available[i] = true;
+}
+
+void free_resources(Thread *thread, Resources *resources)
+{
+    pthread_mutex_lock(&resources->mutex);
+    for (int i = 0; i < thread->num_resources; i++)
+        resources->available[thread->resources[i]] = true;
+    pthread_mutex_unlock(&resources->mutex);
 }
 
 int main()
@@ -48,6 +58,9 @@ int main()
 
 
         // Process the second part of the input (requested resources)
+        Thread thread = {tid, free_time, critical_time, requested_resources, num_resources};
+
+        
         // while ((ch = getchar()) != '\n' && ch != EOF);
     }
     printf("Im out\n");
