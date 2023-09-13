@@ -74,7 +74,7 @@ void *thread_function(void *func_arg)
     spend_time(arg->thread->tid, NULL, arg->thread->free_time); 
     lock_resources(arg->thread, arg->resources);     // a forma de representar os recursos é uma decisão do desenvolvedor
     spend_time(arg->thread->tid,"C",arg->thread->critical_time);
-    free_resources(arg->thread, arg->resources);            // note que cada thread deve ser ter sua lista de recursos registrada em algum lugar
+    free_resources(arg->thread, arg->resources);     // note que cada thread deve ser ter sua lista de recursos registrada em algum lugar
     pthread_exit(NULL);
 }
 
@@ -107,8 +107,12 @@ int main()
         struct ThreadArgs thread_args = {&resources, &thread};
         
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, thread_function, &thread_args);
 
+        if(pthread_create(&thread_id, NULL, thread_function, &thread_args) != 0)
+        {
+            printf("Error creating thread\n");
+            exit(1);
+        }
 
         // while ((ch = getchar()) != '\n' && ch != EOF);
     }
