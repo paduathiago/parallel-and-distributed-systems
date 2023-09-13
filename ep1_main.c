@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include "spend_time.h"
 
 typedef struct
 {
@@ -18,6 +19,11 @@ typedef struct
     pthread_cond_t cond;
     bool available[8];
 } Resources;
+
+struct ThreadArgs {
+    Resources *resources;
+    Thread *thread;
+};
 
 bool requested_available(Thread *thread, Resources *resources)
 {
@@ -54,9 +60,22 @@ void lock_resources(Thread *thread, Resources *resources)
 void free_resources(Thread *thread, Resources *resources)
 {
     pthread_mutex_lock(&resources->mutex);
+    
     for (int i = 0; i < thread->num_resources; i++)
         resources->available[thread->resources[i]] = true;
+    
+    pthread_cond_broadcast(&resources->cond);
     pthread_mutex_unlock(&resources->mutex);
+}
+
+void *thread_function(void *func_arg)
+{
+    struct ThreadArgs *arg = (struct ThreadArgs *) func_arg;
+    spend_time(arg->thread->tid, NULL, arg->thread->free_time); 
+    lock_resources(arg->thread, arg->resources);     // a forma de representar os recursos é uma decisão do desenvolvedor
+    spend_time(arg->thread->tid,"C",arg->thread->critical_time);
+    free_resources(arg->thread, arg->resources);            // note que cada thread deve ser ter sua lista de recursos registrada em algum lugar
+    pthread_exit(NULL);
 }
 
 int main()
@@ -85,6 +104,10 @@ int main()
 
         // Process the second part of the input (requested resources)
         Thread thread = {tid, free_time, critical_time, requested_resources, num_resources};
+        struct ThreadArgs thread_args = {&resources, &thread};
+        
+        pthread_t thread_id;
+        pthread_create(&thread_id, NULL, thread_function, &thread_args);
 
 
         // while ((ch = getchar()) != '\n' && ch != EOF);
