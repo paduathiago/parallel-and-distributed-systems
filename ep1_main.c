@@ -27,22 +27,29 @@ int main()
 {
     int tid, free_time, critical_time;
     int requested_resources[8];
-    Resources *resources;
+    char new_char;
+    Resources resources;
     
-    init_resources(resources);
+    init_resources(&resources);
     
-    while(scanf("%d %d %d", tid, free_time, critical_time) == 3)  // Get input as long as there are 3 integers in the line
+    while(scanf("%d %d %d", &tid, &free_time, &critical_time) == 3)  // Get input as long as there are 3 integers in the line
     {
 
         // Process the first part of the input
+        printf("\ntid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
         
         int num_resources = 0;
         
-        while (num_resources < 8 && scanf("%d", &requested_resources[num_resources]) == 1) 
-            num_resources++;
-        
-        // Process the second part of the input (requested resources)
+        do { 
+            scanf("%d%c", &requested_resources[num_resources], &new_char);
+            printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
+            num_resources++; 
+        } while(new_char != '\n'); 
 
+
+        // Process the second part of the input (requested resources)
+        // while ((ch = getchar()) != '\n' && ch != EOF);
     }
+    printf("Im out\n");
     return 0;
 }
