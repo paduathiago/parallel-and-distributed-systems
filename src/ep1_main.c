@@ -5,13 +5,14 @@
 #include "spend_time.h"
 
 #define MAX_THREADS 1000
+#define AVAILABLE_RESOURCES 8
 
 typedef struct
 {
     int tid;
     int free_time;
     int critical_time;
-    int *resources;
+    int resources[AVAILABLE_RESOURCES];
     int num_resources;
 } Thread;
 
@@ -19,7 +20,7 @@ typedef struct
 {
     pthread_mutex_t mutex;
     pthread_cond_t cond;
-    bool available[8];
+    bool available[AVAILABLE_RESOURCES];
 } Resources;
 
 struct ThreadArgs {
@@ -42,7 +43,7 @@ void init_resources(Resources *resources)
     pthread_mutex_init(&resources->mutex, NULL);
     pthread_cond_init(&resources->cond, NULL);
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < AVAILABLE_RESOURCES; i++)
         resources->available[i] = true;
 }
 
@@ -66,7 +67,7 @@ void free_resources(const Thread thread, Resources *resources)
     for (int i = 0; i < thread.num_resources; i++)
         resources->available[thread.resources[i]] = true;
     
-    pthread_cond_signal(&resources->cond);
+    pthread_cond_broadcast(&resources->cond);
     pthread_mutex_unlock(&resources->mutex);
 }
 
@@ -83,7 +84,6 @@ void *thread_function(void *func_arg)
 int main()
 {
     int tid, free_time, critical_time, num_threads = 0;
-    int requested_resources[8];
     char new_char;
     Resources resources;
     pthread_t THREADS[MAX_THREADS];
@@ -93,6 +93,7 @@ int main()
     
     while(scanf("%d %d %d", &tid, &free_time, &critical_time) == 3)  // Get input as long as there are 3 integers in the line
     {
+        Thread new_thread;
 
         // Process the first part of the input
         //printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
@@ -100,19 +101,18 @@ int main()
         int num_resources = 0;
         
         do { 
-            scanf("%d%c", &requested_resources[num_resources], &new_char);
+            scanf("%d%c", &new_thread.resources[num_resources], &new_char);
             //printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
             num_resources++; 
         } while(new_char != '\n'); 
 
 
         // Process the second part of the input (requested resources)
-        Thread new_thread;
+        
         new_thread.tid = tid;
         new_thread.free_time = free_time;
         new_thread.critical_time = critical_time;
         new_thread.num_resources = num_resources;
-        new_thread.resources = requested_resources;
 
         thread_args[num_threads].resources = &resources;
         thread_args[num_threads].thread = new_thread;
