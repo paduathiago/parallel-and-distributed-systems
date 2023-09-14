@@ -7,6 +7,12 @@
 #define MAX_THREADS 1000
 #define AVAILABLE_RESOURCES 8
 
+/*
+This struct is used to keep track of the information about each thread.
+It contains the thread id, the time it takes to get to the critical section and the time it takes to execute the critical section.
+It also contains an array of integers that represents the resources that the thread needs to execute the critical section.
+The number of resources is stored in num_resources. This makes it possible to loop through the array without having to know its size
+*/
 typedef struct
 {
     int tid;
@@ -19,6 +25,7 @@ typedef struct
 /*
 Resources have been defined as a struct to allow more flexibility.
 mutex and cond are, respectively, pthreads' mutex and condition variables used to control parallel access to the resources properly.
+The have been defined as part of the struct because it represents the elements that are shared between threads and, therefore, can cause race conditions.
 Keeping track of which resources are available is done by the available boolean array. 
 Each position represents a resource, ensuring that any query for the availability of an individual resource is O(1).
 */
@@ -29,6 +36,13 @@ typedef struct
     bool available[AVAILABLE_RESOURCES];
 } Resources;
 
+
+/*
+This struct is used to pass the arguments to the thread_function.
+It contains a pointer to the resources struct, which is shared between threads throughot the entire execution of the program.
+This aproach was chosen instead of using global variables because it allows the program to be more flexible and safe.
+It also contains a Thread struct, which keeps the information about the thread that is being created
+*/
 struct ThreadArgs {
     Resources *resources;
     Thread thread;
@@ -54,6 +68,14 @@ void init_resources(Resources *resources)
         resources->available[i] = true;
 }
 
+/*
+This functiom is responsible for control the shared resources. The syncronization is assured by the mutex and condition variable.
+The mutex that grants access to the resources and the available array is locked when a thread enters the critical section. It then checks if the requested resources are available.
+If they are not, the thread waits for a signal from another thread that the resources are available.
+When the signal is received, the thread checks again, on the while loop, if the resources are available. If they are not, it waits again.
+Once the resources are available, the thread locks the resources and sets the availability of the resources to false.
+When the thread leaves the critical section, it unlocks the mutex so that others can try to access the resources.
+*/
 void lock_resources(const Thread thread, Resources *resources)
 {
     pthread_mutex_lock(&resources->mutex);
@@ -67,6 +89,11 @@ void lock_resources(const Thread thread, Resources *resources)
     pthread_mutex_unlock(&resources->mutex);
 }
 
+/*
+This function is responsible for freeing the resources that were locked by the thread.
+It locks the mutex that grants access to the available array, sets the availability of the resources to true and broadcasts a signal to all threads that the resources are available.
+After that, it unlocks the mutex so that other threads can access the resources.
+*/
 void free_resources(const Thread thread, Resources *resources)
 {
     pthread_mutex_lock(&resources->mutex);
