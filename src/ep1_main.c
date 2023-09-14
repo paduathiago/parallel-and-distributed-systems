@@ -9,7 +9,7 @@ typedef struct
     int tid;
     int free_time;
     int critical_time;
-    int resources[8];
+    int *resources;
     int num_resources;
 } Thread;
 
@@ -91,7 +91,7 @@ int main()
     {
 
         // Process the first part of the input
-        //printf("\ntid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
+        printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
         
         int num_resources = 0;
         
@@ -103,7 +103,13 @@ int main()
 
 
         // Process the second part of the input (requested resources)
-        Thread thread = {tid, free_time, critical_time, requested_resources, num_resources};
+        Thread thread;
+        thread.tid = tid;
+        thread.free_time = free_time;
+        thread.critical_time = critical_time;
+        thread.num_resources = num_resources;
+        thread.resources = requested_resources;
+
         struct ThreadArgs thread_args = {&resources, &thread};
         
         pthread_t thread_id;
@@ -114,8 +120,7 @@ int main()
             exit(1);
         }
 
-        // while ((ch = getchar()) != '\n' && ch != EOF);
+        //while ((ch = getchar()) != '\n' && ch != EOF);
     }
-    printf("Im out\n");
     return 0;
 }
