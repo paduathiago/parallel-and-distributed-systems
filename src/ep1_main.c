@@ -16,6 +16,12 @@ typedef struct
     int num_resources;
 } Thread;
 
+/*
+Resources have been defined as a struct to allow more flexibility.
+mutex and cond are, respectively, pthreads' mutex and condition variables used to control parallel access to the resources properly.
+Keeping track of which resources are available is done by the available boolean array. 
+Each position represents a resource, ensuring that any query for the availability of an individual resource is O(1).
+*/
 typedef struct
 {
     pthread_mutex_t mutex;
@@ -28,7 +34,7 @@ struct ThreadArgs {
     Thread thread;
 };
 
-bool requested_available(const Thread thread, const Resources *resources)
+bool is_requested_available(const Thread thread, const Resources *resources)
 {
     for (int i = 0; i < thread.num_resources; i++)
     {
@@ -38,6 +44,7 @@ bool requested_available(const Thread thread, const Resources *resources)
     return true;
 }
 
+/*Initializes mutex, condition variable and sets every value in Resources.available to true*/
 void init_resources(Resources *resources)
 {
     pthread_mutex_init(&resources->mutex, NULL);
@@ -51,7 +58,7 @@ void lock_resources(const Thread thread, Resources *resources)
 {
     pthread_mutex_lock(&resources->mutex);
     
-    while (!requested_available(thread, resources))
+    while (!is_requested_available(thread, resources))
         pthread_cond_wait(&resources->cond, &resources->mutex);
     
     for(int i = 0; i < thread.num_resources; i++)
