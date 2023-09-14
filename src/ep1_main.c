@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include "spend_time.h"
 
+#define MAX_THREADS 1000
+
 typedef struct
 {
     int tid;
@@ -22,14 +24,14 @@ typedef struct
 
 struct ThreadArgs {
     Resources *resources;
-    Thread *thread;
+    Thread thread;
 };
 
-bool requested_available(Thread *thread, Resources *resources)
+bool requested_available(const Thread thread, const Resources *resources)
 {
-    for (int i = 0; i < thread->num_resources; i++)
+    for (int i = 0; i < thread.num_resources; i++)
     {
-        if (!resources->available[thread->resources[i]])
+        if (!resources->available[thread.resources[i]])
             return false;
     }
     return true;
@@ -44,46 +46,48 @@ void init_resources(Resources *resources)
         resources->available[i] = true;
 }
 
-void lock_resources(Thread *thread, Resources *resources)
+void lock_resources(const Thread thread, Resources *resources)
 {
     pthread_mutex_lock(&resources->mutex);
     
     while (!requested_available(thread, resources))
         pthread_cond_wait(&resources->cond, &resources->mutex);
     
-    for(int i = 0; i < thread->num_resources; i++)
-        resources->available[thread->resources[i]] = false;
+    for(int i = 0; i < thread.num_resources; i++)
+        resources->available[thread.resources[i]] = false;
     
     pthread_mutex_unlock(&resources->mutex);
 }
 
-void free_resources(Thread *thread, Resources *resources)
+void free_resources(const Thread thread, Resources *resources)
 {
     pthread_mutex_lock(&resources->mutex);
     
-    for (int i = 0; i < thread->num_resources; i++)
-        resources->available[thread->resources[i]] = true;
+    for (int i = 0; i < thread.num_resources; i++)
+        resources->available[thread.resources[i]] = true;
     
-    pthread_cond_broadcast(&resources->cond);
+    pthread_cond_signal(&resources->cond);
     pthread_mutex_unlock(&resources->mutex);
 }
 
 void *thread_function(void *func_arg)
 {
     struct ThreadArgs *arg = (struct ThreadArgs *) func_arg;
-    spend_time(arg->thread->tid, NULL, arg->thread->free_time); 
+    spend_time(arg->thread.tid, NULL, arg->thread.free_time); 
     lock_resources(arg->thread, arg->resources);     // a forma de representar os recursos é uma decisão do desenvolvedor
-    spend_time(arg->thread->tid,"C",arg->thread->critical_time);
+    spend_time(arg->thread.tid, "C", arg->thread.critical_time);
     free_resources(arg->thread, arg->resources);     // note que cada thread deve ser ter sua lista de recursos registrada em algum lugar
     pthread_exit(NULL);
 }
 
 int main()
 {
-    int tid, free_time, critical_time;
+    int tid, free_time, critical_time, num_threads = 0;
     int requested_resources[8];
     char new_char;
     Resources resources;
+    pthread_t THREADS[MAX_THREADS];
+    struct ThreadArgs thread_args[MAX_THREADS];
     
     init_resources(&resources);
     
@@ -91,7 +95,7 @@ int main()
     {
 
         // Process the first part of the input
-        printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
+        //printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
         
         int num_resources = 0;
         
@@ -103,24 +107,23 @@ int main()
 
 
         // Process the second part of the input (requested resources)
-        Thread thread;
-        thread.tid = tid;
-        thread.free_time = free_time;
-        thread.critical_time = critical_time;
-        thread.num_resources = num_resources;
-        thread.resources = requested_resources;
+        Thread new_thread;
+        new_thread.tid = tid;
+        new_thread.free_time = free_time;
+        new_thread.critical_time = critical_time;
+        new_thread.num_resources = num_resources;
+        new_thread.resources = requested_resources;
 
-        struct ThreadArgs thread_args = {&resources, &thread};
+        thread_args[num_threads].resources = &resources;
+        thread_args[num_threads].thread = new_thread;
         
-        pthread_t thread_id;
-
-        if(pthread_create(&thread_id, NULL, thread_function, &thread_args) != 0)
+        if(pthread_create(&THREADS[num_threads], NULL, thread_function, &thread_args[num_threads]) != 0)
         {
             printf("Error creating thread\n");
             exit(1);
         }
 
-        //while ((ch = getchar()) != '\n' && ch != EOF);
+        num_threads++;
     }
     return 0;
 }
