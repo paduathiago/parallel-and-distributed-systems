@@ -9,10 +9,10 @@
 
 /*
 This struct is used to keep track of the information about each thread.
-It contains the thread id, the time it takes to get to the critical section and the time it takes to execute the critical section.
-It also contains an array of integers that represents the resources that the thread needs to execute the critical section.
+It contains the thread id, the time it takes to get to the critical section and to execute it.
+It also contains an array of integers that represents the resources needed to execute the critical section.
 The number of resources is stored in num_resources. This makes it possible to loop through the array without having to know its size
-and makes it easier to loop through the shared resources.available array.
+and permits to alter only the appropirate positions in the resources.available array.
 */
 typedef struct
 {
@@ -71,12 +71,11 @@ void init_resources(Resources *resources)
 }
 
 /*
-This functiom is responsible for control the shared resources. The syncronization is assured by the mutex and condition variable.
+This functiom is responsible for controlling the shared resources. The syncronization is assured by the mutex and condition variable.
 The mutex that grants access to the resources and the available array is locked when a thread enters the critical section. It then checks if the requested resources are available.
 If they are not, the thread waits for a signal from another thread that the resources are available.
 When the signal is received, the thread checks again, on the while loop, if the resources are available. If they are not, it waits again. It's important to
-use a while loop instead of an if statement because the thread can wake up without the resources being available. In this way, it will check every time it is woken up
-and never hold the mutex or any resources while waiting.
+use a while loop instead of an if statement because the thread can wake up without the resources being available. In this way, it will check every time it is woken up and never hold the mutex or any resources while waiting.
 Once the resources are available, the thread locks the resources and sets the availability of the resources to false.
 When the thread leaves the critical section, it unlocks the mutex so that others can try to access the resources.
 */
@@ -96,7 +95,7 @@ void lock_resources(const Thread thread, Resources *resources)
 /*
 This function is responsible for freeing the resources that were locked by the thread.
 It locks the mutex that grants access to the available array, sets the availability of the resources
-to true and broadcasts a signal to all threads that the resources are available.
+to true and broadcasts a signal to all threads whose resources are available.
 After that, it unlocks the mutex so other threads can access the resources.
 */
 void free_resources(const Thread thread, Resources *resources)
@@ -127,6 +126,14 @@ void *thread_function(void *func_arg)
     pthread_exit(NULL);
 }
 
+/*
+Main reasons why this program doesnt use global variables:
+- Modularity: Avoiding global variables promotes modularity and encapsulation,
+as data is explicitly passed between functions and threads using parameters and return values.
+- Debugging: Debugging becomes more challenging when global variables are involved, as it's harder
+to pinpoint which thread or part of the code is responsible for issues related to shared data.
+*/
+
 int main()
 {
     int tid, free_time, critical_time, num_threads = 0;
@@ -141,7 +148,6 @@ int main()
     {
         Thread new_thread;
 
-        // Process the first part of the input
         //printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
         
         int num_resources = 0;
@@ -151,9 +157,6 @@ int main()
             //printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
             num_resources++; 
         } while(new_char != '\n'); 
-
-
-        // Process the second part of the input (requested resources)
         
         new_thread.tid = tid;
         new_thread.free_time = free_time;
@@ -171,5 +174,7 @@ int main()
 
         num_threads++;
     }
+
+    pthread_exit(NULL);
     return 0;
 }
