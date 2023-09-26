@@ -147,20 +147,20 @@ int main()
     while(scanf("%d %d %d", &tid, &free_time, &critical_time) == 3)  // Get input as long as there are 3 integers in the line
     {
         Thread new_thread;
-
-        //printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
-        
-        int num_resources = 0;
-        
-        do { 
-            scanf("%d%c", &new_thread.resources[num_resources], &new_char);
-            //printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
-            num_resources++; 
-        } while(new_char != '\n'); 
-        
         new_thread.tid = tid;
         new_thread.free_time = free_time;
         new_thread.critical_time = critical_time;
+        
+        //printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
+        
+        int num_resources = 0;
+
+        do { 
+            scanf("%d%c", &new_thread.resources[num_resources], &new_char);
+            //printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
+            num_resources++;
+        } while(new_char != '\n'); 
+        
         new_thread.num_resources = num_resources;
 
         thread_args[num_threads].resources = &resources;
