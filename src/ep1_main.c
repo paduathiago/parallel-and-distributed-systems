@@ -120,9 +120,9 @@ void *thread_function(void *func_arg)
 {
     struct ThreadArgs *arg = (struct ThreadArgs *) func_arg;
     spend_time(arg->thread.tid, NULL, arg->thread.free_time); 
-    lock_resources(arg->thread, arg->resources);     // a forma de representar os recursos é uma decisão do desenvolvedor
+    lock_resources(arg->thread, arg->resources);
     spend_time(arg->thread.tid, "C", arg->thread.critical_time);
-    free_resources(arg->thread, arg->resources);     // note que cada thread deve ser ter sua lista de recursos registrada em algum lugar
+    free_resources(arg->thread, arg->resources);
     pthread_exit(NULL);
 }
 
@@ -151,13 +151,10 @@ int main()
         new_thread.free_time = free_time;
         new_thread.critical_time = critical_time;
         
-        //printf("tid: %d, free_time: %d, critical_time: %d\n", tid, free_time, critical_time);
-        
         int num_resources = 0;
 
         do { 
             scanf("%d%c", &new_thread.resources[num_resources], &new_char);
-            //printf("requested_resources[%d]: %d\n", num_resources, requested_resources[num_resources]); 
             num_resources++;
         } while(new_char != '\n'); 
         
