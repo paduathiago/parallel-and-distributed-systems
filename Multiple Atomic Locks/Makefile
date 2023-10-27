@@ -5,7 +5,7 @@ CC = gcc
 # Flags de compilação
 CFLAGS = -Wall -Wextra -g
 
-BUILD_DIR    = ./build
+BUILD_DIR    = ../build
 SRC_DIR    = ./src
 INCLUDE_DIR  = ./include
 
