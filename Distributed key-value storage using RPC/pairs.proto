@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package pairs;
+
+service PairsServer
+{
+    rpc insert(KeyValue) returns (BoolResponse);
+    rpc get(Key) returns (Value);
+    rpc activate(Value) returns (Value);
+    rpc quit(Empty) returns (BoolResponse);
+}
+
+message KeyValue
+{
+    int key = 1;
+    string value = 2;
+}
+
+message Key 
+{
+    int key = 1;
+}
+
+message Value 
+{
+    string value = 1;
+}
+
+message BoolResponse 
+{
+    bool success = 1;
+}
+
+message Empty {}
