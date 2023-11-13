@@ -31,7 +31,6 @@ def main():
     # 3. Create a stub object using the client stub and the channel.
     stub = pairs_pb2_grpc.PairsStub(channel)
     
-    # 4. TODO: Read input from the user and call the appropriate RPC.
     try:
         while True:
             command = input().strip()

@@ -7,7 +7,7 @@ service Pairs
     rpc insert(KeyValue) returns (SuccResponse);
     rpc get(Key) returns (Value);
     rpc activate(Value) returns (Value);
-    rpc quit(Empty) returns (SuccResponse);
+    rpc terminate(Empty) returns (SuccResponse);
 }
 
 message KeyValue
