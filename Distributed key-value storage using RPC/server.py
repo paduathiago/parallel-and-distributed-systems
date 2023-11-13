@@ -1,4 +1,5 @@
 import grpc
+import sys
 from concurrent import futures
 
 import pairs_pb2, pairs_pb2_grpc
@@ -17,7 +18,13 @@ class Pair(pairs_pb2_grpc.PairsServicer):
     def get(self, context, request): 
         return pairs_pb2.Value(value=self.my_dict.get(request.key, ""))
     
+    def activate(self, request, context):
+        pass
     
+    def terminate(self, context, request):
+        # TODO: terminate server
+        return pairs_pb2.SuccResponse(success=0)
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
