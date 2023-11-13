@@ -21,7 +21,7 @@ def activate_service(stub, service_identifier):
 def terminate_server(stub):
     request = pairs_pb2.quit()
     response = stub.quit(request)
-
+    print(response.success, end="\n")
 
 # 1. Import the necessary gRPC modules and the generated client stub.
 def main():
@@ -32,6 +32,32 @@ def main():
     stub = pairs_pb2_grpc.PairsStub(channel)
     
     # 4. TODO: Read input from the user and call the appropriate RPC.
-    
+    try:
+        while True:
+            command = input().strip()
+
+            # Check if there is nothing left to read (an empty string)
+            if not command:
+                break
+
+            if command.startswith("I"):
+                _, key, description = command.split(",", 2)
+                insert(stub, int(key), description)
+
+            elif command.startswith("C"):
+                _, key = command.split(",", 1)
+                get(stub, int(key))
+
+            elif command == "T":
+                terminate_server(stub)
+                # break Exit the loop when the command is "T"
+
+            """elif command.startswith("A"):
+                _, service_identifier = command.split(",", 1)
+                result = activate_service(stub, service_identifier)
+                print(result)"""
+            
+    except Exception as e:
+        print(f"Error: {e}")
 
 
