@@ -2,23 +2,23 @@ syntax = "proto3";
 
 package pairs;
 
-service PairsServer
+service Pairs
 {
-    rpc insert(KeyValue) returns (BoolResponse);
+    rpc insert(KeyValue) returns (SuccResponse);
     rpc get(Key) returns (Value);
     rpc activate(Value) returns (Value);
-    rpc quit(Empty) returns (BoolResponse);
+    rpc quit(Empty) returns (SuccResponse);
 }
 
 message KeyValue
 {
-    int key = 1;
+    int32 key = 1;
     string value = 2;
 }
 
 message Key 
 {
-    int key = 1;
+    int32 key = 1;
 }
 
 message Value 
@@ -26,9 +26,9 @@ message Value
     string value = 1;
 }
 
-message BoolResponse 
+message SuccResponse 
 {
-    bool success = 1;
+    int32 success = 1;
 }
 
 message Empty {}
