@@ -1,4 +1,5 @@
 import grpc
+import os
 import sys
 import threading
 from concurrent import futures
@@ -22,7 +23,9 @@ class Pair(pairs_pb2_grpc.PairsServicer):
     
     def activate(self, request, context):
         if len(sys.argv) > 1:
-            # TODO: activate server
+            # TODO: activate server:
+            # param: central servers' address
+            # rpc to central server register
             pass
         return pairs_pb2.SuccResponse(success=0)
     
