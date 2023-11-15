@@ -32,7 +32,7 @@ class Pair(pairs_pb2_grpc.PairsServicer):
                                                        server_keys=self.my_dict.keys()))
             return pairs_pb2.KeyCounter(count=response.count)
 
-        return pairs_pb2.SuccResponse(success=0)
+        return pairs_pb2.KeyCounter(count=0)
     
     
     def terminate(self, context, request):
