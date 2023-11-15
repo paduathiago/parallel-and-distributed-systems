@@ -24,8 +24,8 @@ class CentralServer:
     def findOwner(self, request, context):
         for server_id in self.my_servers:
             if request.key in self.my_servers[server_id]:
-                return pairs_pb2.OwnerResponse(owner_id=server_id)
-        return pairs_pb2.OwnerResponse(owner_id="")
+                return pairs_pb2.ServerId(id=server_id)  # Check if it is possible to have a server without the keys list
+        return pairs_pb2.ServerId(id="")
 
 
 def serve():

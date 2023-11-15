@@ -17,20 +17,30 @@ private:
     std::unordered_map<int, std::string> dict;
 
 public:
-    Status insert(ServerContext* context, const KeyValue* request, InsertResponse* response) override {
+    int insert(ServerContext* context, const KeyValue* request, SuccResponse* response) override 
+    {
         // Lógica de inserção aqui
-        dict.insert({request->key(), request->value()});
-        cout << "Inserindo: " << request->key() << ", " << request->value() << endl;
-        response->set_success(true);
-        return Status::OK;
+        if(dict.insert({request->key(), request->value()}).second)
+        {
+            cout << "Inserindo: " << request->key() << ", " << request->value() << endl;
+            response->set_success(0);
+            return 0;
+        }
+        else
+        {
+            cout << "Chave já existe: " << request->key() << ", " << request->value() << endl;
+            response->set_success(-1);
+            return -1;
+        }
     }
 
-    Status get(ServerContext* context, const Key* request, Value* response) override {
+    Status get(ServerContext* context, const Key* request, Value* response) override 
+    {
         // Lógica de consulta aqui
         cout << "Consultando chave: " << request->key() << endl;
         if (dict.find(request->key) != dict.end()) 
             response->set_value(dict[request->key]);
-    
+
         else 
             // A chave não existe
             response->set_value("");

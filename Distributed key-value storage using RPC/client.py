@@ -11,12 +11,12 @@ def get(stub, key):
     response = stub.get(request)
     print(response.value, end="\n")
 
-"""
-def activate_service(stub, service_identifier):
-    request = pairs_pb2.ActivateRequest(service_identifier=service_identifier)
-    response = stub.Activate(request)
-    return response.status
-"""
+
+def activate_service(stub, server_id):
+    request = pairs_pb2.ServerId(id=server_id)
+    response = stub.activate(request)
+    print (response.count, end="\n")
+
 
 def terminate_server(stub):
     request = pairs_pb2.quit()
@@ -51,12 +51,9 @@ def main():
                 terminate_server(stub)
                 # break Exit the loop when the command is "T"
 
-            """elif command.startswith("A"):
+            elif command.startswith("A"):
                 _, service_identifier = command.split(",", 1)
-                result = activate_service(stub, service_identifier)
-                print(result)"""
+                activate_service(stub, service_identifier) 
             
     except Exception as e:
         print(f"Error: {e}")
-
-
