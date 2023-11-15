@@ -6,7 +6,7 @@ service Pairs
 {
     rpc insert(KeyValue) returns (SuccResponse);
     rpc get(Key) returns (Value);
-    rpc activate(Value) returns (Value);
+    rpc activate(Server) returns (KeyCounter);
     rpc terminate(Empty) returns (SuccResponse);
 }
 
@@ -14,7 +14,7 @@ service CentralServer
 {
     rpc register(Server) returns (KeyCounter);
     rpc terminate(Empty) returns (SuccResponse);
-    rpc findOwner(Key) returns (Server)
+    rpc findOwner(Key) returns (Server);
 }
 
 message KeyValue
@@ -40,7 +40,7 @@ message SuccResponse
 
 message Server
 {
-    int32 id = 1;
+    string id = 1;
     repeated int32 keys = 2;
 }
 
