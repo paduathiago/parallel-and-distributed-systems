@@ -1,5 +1,6 @@
 import grpc
 import os
+import socket
 import sys
 import threading
 from concurrent import futures
@@ -10,6 +11,7 @@ class Pair(pairs_pb2_grpc.PairsServicer):
     def __init__(self, event):
         self.my_dict = {}
         self.stop_event = event
+        self.port = os.environ.get("PORT", "8888")  # TODO: receive port from command line
     
     def insert(self, context, request):
         if request.key not in self.my_dict:
@@ -21,13 +23,17 @@ class Pair(pairs_pb2_grpc.PairsServicer):
     def get(self, context, request): 
         return pairs_pb2.Value(value=self.my_dict.get(request.key, ""))
     
+
     def activate(self, request, context):
         if len(sys.argv) > 1:
-            # TODO: activate server:
-            # param: central servers' address
-            # rpc to central server register
-            pass
+            channel = grpc.insecure_channel(request.server_id)
+            stub = pairs_pb2_grpc.CentralServerStub(channel)
+            response = stub.register(pairs_pb2.Server(server_id=f"{socket.getfqdn()}:{self.port}",
+                                                       server_keys=self.my_dict.keys()))
+            return pairs_pb2.KeyCounter(count=response.count)
+
         return pairs_pb2.SuccResponse(success=0)
+    
     
     def terminate(self, context, request):
         self.stop_event.set()
@@ -43,3 +49,7 @@ def serve():
     stop_event.wait()
     server.stop(1)
     # server.wait_for_termination()
+
+
+if __name__ == '__main__':
+    serve()
