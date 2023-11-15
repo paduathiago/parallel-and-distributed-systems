@@ -22,7 +22,10 @@ class CentralServer:
     
 
     def findOwner(self, request, context):
-        pass
+        for server_id in self.my_servers:
+            if request.key in self.my_servers[server_id]:
+                return pairs_pb2.OwnerResponse(owner_id=server_id)
+        return pairs_pb2.OwnerResponse(owner_id="")
 
 
 def serve():
