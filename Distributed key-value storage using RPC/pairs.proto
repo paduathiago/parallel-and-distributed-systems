@@ -6,7 +6,7 @@ service Pairs
 {
     rpc insert(KeyValue) returns (SuccResponse);
     rpc get(Key) returns (Value);
-    rpc activate(Server) returns (KeyCounter);
+    rpc activate(ServerId) returns (KeyCounter);
     rpc terminate(Empty) returns (SuccResponse);
 }
 
@@ -14,7 +14,7 @@ service CentralServer
 {
     rpc register(Server) returns (KeyCounter);
     rpc terminate(Empty) returns (SuccResponse);
-    rpc findOwner(Key) returns (Server);
+    rpc findOwner(Key) returns (ServerId);
 }
 
 message KeyValue
@@ -31,6 +31,11 @@ message Key
 message Value 
 {
     string value = 1;
+}
+
+message ServerId
+{
+    string id = 1;
 }
 
 message SuccResponse 
