@@ -1,4 +1,5 @@
 import grpc
+import sys
 import pairs_pb2, pairs_pb2_grpc
 
 
@@ -22,10 +23,9 @@ def terminate_server(stub):
     response = stub.quit(request)
     print(response.success, end="\n")
 
-# 1. Import the necessary gRPC modules and the generated client stub.
 def main():
     # 2. Create a gRPC channel to connect to the server.
-    channel = grpc.insecure_channel('localhost:8888')  # TODO: receive ID string from command line
+    channel = grpc.insecure_channel(sys.argv[1])
 
     # 3. Create a stub object using the client stub and the channel.
     stub = pairs_pb2_grpc.PairsStub(channel)

@@ -1,4 +1,5 @@
 import grpc
+import sys
 import pairs_pb2, pairs_pb2_grpc
 
 def insert(stub, key, description):
@@ -26,11 +27,10 @@ def terminate_server(stub):
 # 1. Import the necessary gRPC modules and the generated client stub.
 def main():
     # 2. Create a gRPC channel to connect to the server.
-    channel = grpc.insecure_channel('localhost:8888')
+    channel = grpc.insecure_channel("localhost:8888")  # ATENÇÃO
 
     # 3. Create a stub object using the client stub and the channel.
     stub = pairs_pb2_grpc.PairsStub(channel)
-    
     try:
         while True:
             command = input().strip()
@@ -57,3 +57,7 @@ def main():
             
     except Exception as e:
         print(f"Error: {e}")
+
+
+if __name__ == '__main__':
+    main()
