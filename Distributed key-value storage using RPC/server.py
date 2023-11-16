@@ -1,5 +1,4 @@
 import grpc
-import os
 import socket
 import sys
 import threading
@@ -18,8 +17,8 @@ class Pair(pairs_pb2_grpc.PairsServicer):
         if request.key not in self.my_dict:
             self.my_dict[request.key] = request.value
             return pairs_pb2.SuccResponse(success=0)
-        else:
-            return pairs_pb2.SuccResponse(success=-1)
+
+        return pairs_pb2.SuccResponse(success=-1)
     
 
     def get(self, request, context): 
@@ -28,10 +27,10 @@ class Pair(pairs_pb2_grpc.PairsServicer):
 
     def activate(self, request, context):
         if len(sys.argv) > 2:
-            channel = grpc.insecure_channel(request.server_id)
+            channel = grpc.insecure_channel(request.id)
             stub = pairs_pb2_grpc.CentralServerStub(channel)
-            response = stub.register(pairs_pb2.Server(server_id=f"{socket.getfqdn()}:{self.port}",
-                                                       server_keys=self.my_dict.keys()))
+            response = stub.register(pairs_pb2.Server(id=f"{socket.getfqdn()}:{self.port}",
+                                                       keys=self.my_dict.keys()))
             return pairs_pb2.KeyCounter(count=response.count)
 
         return pairs_pb2.KeyCounter(count=0)

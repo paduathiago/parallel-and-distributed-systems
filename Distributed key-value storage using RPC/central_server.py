@@ -1,5 +1,4 @@
 import grpc
-import socket
 import sys
 import threading
 
@@ -15,8 +14,8 @@ class CentralServer:
 
     def register(self, request, context):
         keys_processed = 0
-        for key in request.server_keys:
-            self.keys_servers[key] = request.server_id
+        for key in request.keys:
+            self.keys_servers[key] = request.id
             keys_processed += 1
         return pairs_pb2.KeyCounter(count=keys_processed)
 

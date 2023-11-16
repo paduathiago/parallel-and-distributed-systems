@@ -7,6 +7,7 @@ def insert(stub, key, description):
     response = stub.insert(request)
     print(response.success, end="\n")
 
+
 def get(stub, key):
     request = pairs_pb2.Key(key=key)
     response = stub.get(request)
@@ -23,7 +24,6 @@ def terminate_server(stub):
     request = pairs_pb2.Empty()
     response = stub.terminate(request)
     print(response.success, end="\n")
-    sys.exit(0)
 
 # 1. Import the necessary gRPC modules and the generated client stub.
 def main():
@@ -50,7 +50,7 @@ def main():
 
             elif command == "T":
                 terminate_server(stub)
-                # break Exit the loop when the command is "T"
+                break
 
             elif command.startswith("A"):
                 _, service_identifier = command.split(",", 1)
