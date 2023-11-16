@@ -19,9 +19,10 @@ def findOwner(stub, key):
 
 
 def terminate_server(stub):
-    request = pairs_pb2.quit()
-    response = stub.quit(request)
+    request = pairs_pb2.Empty()
+    response = stub.terminate(request)
     print(response.success, end="\n")
+    sys.exit(0)
 
 def main():
     # 2. Create a gRPC channel to connect to the server.

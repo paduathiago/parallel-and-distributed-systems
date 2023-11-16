@@ -13,6 +13,7 @@ class Pair(pairs_pb2_grpc.PairsServicer):
         self.stop_event = event
         self.port = port
     
+    
     def insert(self, request, context):
         if request.key not in self.my_dict:
             self.my_dict[request.key] = request.value
@@ -20,6 +21,7 @@ class Pair(pairs_pb2_grpc.PairsServicer):
         else:
             return pairs_pb2.SuccResponse(success=-1)
     
+
     def get(self, request, context): 
         return pairs_pb2.Value(value=self.my_dict.get(request.key, ""))
     
@@ -44,7 +46,7 @@ def serve():
     stop_event = threading.Event()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pairs_pb2_grpc.add_PairsServicer_to_server(Pair(stop_event, sys.argv[1]), server)
-    server.add_insecure_port(f'localhost:{sys.argv[1]}')  # Check
+    server.add_insecure_port(f'[::]:{sys.argv[1]}')  # Check
     server.start()
     stop_event.wait()
     server.stop(1)
