@@ -3,13 +3,15 @@ import sys
 import pairs_pb2, pairs_pb2_grpc
 
 
+
+
 def findOwner(stub, key):
     request = pairs_pb2.Key(key=key)
     response = stub.findOwner(request)
     
-    if(response.server_id != ""):
-        print(response.server_id, end=":")
-        channel = grpc.insecure_channel(response.server_id)
+    if(response.id != ""):
+        print(response.id, end=":")
+        channel = grpc.insecure_channel(response.id)
         stub = pairs_pb2_grpc.PairsStub(channel)
         request = pairs_pb2.Key(key=key)
         response = stub.get(request)
