@@ -35,10 +35,6 @@ def main():
         while True:
             command = input().strip()
 
-            # Check if there is nothing left to read (an empty string)
-            if not command:
-                break
-
             if command.startswith("C"):
                 _, key = command.split(",", 1)
                 findOwner(stub, int(key))
@@ -47,9 +43,9 @@ def main():
                 terminate_server(stub)
                 break 
   
-    except Exception as e:
-        print(f"Error: {e}")
-
+    except EOFError:
+        sys.exit(0)
     
+
 if __name__ == '__main__':
     main()

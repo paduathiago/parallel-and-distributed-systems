@@ -1,5 +1,4 @@
 I,1,OICJNEIC
 C,1
-OICJNEIC
 C,2
 A,[::]:5151

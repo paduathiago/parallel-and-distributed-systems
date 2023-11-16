@@ -36,10 +36,6 @@ def main():
         while True:
             command = input().strip()
 
-            # Check if there is nothing left to read (an empty string)
-            if not command:
-                break
-
             if command.startswith("I"):
                 _, key, description = command.split(",", 2)
                 insert(stub, int(key), description)
@@ -56,8 +52,8 @@ def main():
                 _, service_identifier = command.split(",", 1)
                 activate_service(stub, service_identifier) 
             
-    except Exception as e:
-        print(f"Error: {e}")
+    except EOFError:
+        sys.exit(0)
 
 
 if __name__ == '__main__':
