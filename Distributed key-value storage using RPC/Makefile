@@ -1,48 +1,31 @@
-# Makefile para compilar programas C++ e o arquivo .proto
+.PHONY: clean run_cli_pares run_serv_pares_1 run_serv_pares_2 run_serv_central run_cli_central generate_proto
 
-# Compilador
-CXX = g++
-# Opções de compilação
-CXXFLAGS = -std=c++11 -pthread
+# Regra para limpar arquivos intermediários
+clean: generate_proto
+    rm -f pairs_pb2.py pairs_pb2_grpc.py
 
-# Diretório de inclusão para os cabeçalhos gerados pelo proto
-PROTO_INC = .
+# Regra para executar o cliente da primeira parte
+run_cli_pares: generate_proto
+    python client.py $(arg)
 
-# Diretório de inclusão para as bibliotecas do gRPC
-GRPC_INC = /usr/local/lib
+# Regra para executar o servidor de pares com comportamento da primeira parte
+run_serv_pares_1: generate_proto
+    python server.py $(arg)
 
-# Diretório de inclusão para o arquivo .proto
-PROTO_DIR = .
+# Regra para executar o servidor de pares com comportamento da segunda parte
+run_serv_pares_2: generate_proto
+    python server.py $(arg) qqcoisa
 
-# Nome do executável do servidor
-SERVER_EXEC = server
+# Regra para executar o servidor central da segunda parte
+run_serv_central: generate_proto
+    python central_server.py $(arg)
 
-# Nome do executável do cliente
-CLIENT_EXEC = client
+# Regra para executar o cliente da segunda parte
+run_cli_central: generate_proto
+    python central_client.py $(arg)
 
-# Nome do arquivo .proto
-PROTO_FILE = pairs.proto
+# Regra para gerar arquivos intermediários a partir do arquivo proto
+generate_proto: pairs_pb2.py pairs_pb2_grpc.py
 
-# Nomes dos arquivos fonte
-SERVER_SRC = server.cpp
-CLIENT_SRC = client.cpp
-
-# Nomes dos arquivos gerados pelo proto
-PROTO_CC = $(PROTO_DIR)pairs.pb.cc
-PROTO_GRPC_CC = $(PROTO_DIR)pairs.grpc.pb.cc
-
-all: $(SERVER_EXEC) $(CLIENT_EXEC)
-
-$(SERVER_EXEC): $(SERVER_SRC) $(PROTO_CC) $(PROTO_GRPC_CC)
-	$(CXX) $(CXXFLAGS) -I$(PROTO_INC) -L$(GRPC_INC) -o $@ $^ -lgrpc++ -lgrpc -lprotobuf
-
-$(CLIENT_EXEC): $(CLIENT_SRC) $(PROTO_CC) $(PROTO_GRPC_CC)
-	$(CXX) $(CXXFLAGS) -I$(PROTO_INC) -L$(GRPC_INC) -o $@ $^ -lgrpc++ -lgrpc -lprotobuf
-
-$(PROTO_CC) $(PROTO_GRPC_CC): $(PROTO_FILE)
-	protoc -I=$(PROTO_DIR) --cpp_out=$(PROTO_DIR) --grpc_out=$(PROTO_DIR) --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` $<
-
-clean:
-	rm -f $(SERVER_EXEC) $(CLIENT_EXEC) $(PROTO_CC) $(PROTO_GRPC_CC)
-
-.PHONY: all clean
+pairs_pb2.py pairs_pb2_grpc.py: pairs.proto
+    python -m grpc_tools.protoc -I=. --python_out=. --grpc_python_out=. pairs.proto
