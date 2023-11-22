@@ -25,10 +25,10 @@ def terminate_server(stub):
 
 
 def main():
-    # 2. Create a gRPC channel to connect to the server.
+    # Create a gRPC channel to connect to the server.
     channel = grpc.insecure_channel(sys.argv[1])
 
-    # 3. Create a stub object using the client stub and the channel.
+    # Create a stub object using the client stub and the channel.
     stub = pairs_pb2_grpc.CentralServerStub(channel)
     
     try:

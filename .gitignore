@@ -4,3 +4,5 @@ ep1
 *.o
 input.txt
 rpc
+*_pb2*
+cpp

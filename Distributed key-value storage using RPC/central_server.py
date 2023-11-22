@@ -6,6 +6,7 @@ from concurrent import futures
 
 import pairs_pb2, pairs_pb2_grpc
 
+
 class CentralServer:
     def __init__(self, event):
         self.keys_servers = {}
@@ -40,6 +41,7 @@ def serve():
     server.start()
     stop_event.wait()
     server.stop(1)
+
 
 if __name__ == '__main__':
     serve()
