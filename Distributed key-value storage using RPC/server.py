@@ -94,7 +94,7 @@ def serve():
         Pair(stop_event, sys.argv[1]), server)
     server.add_insecure_port(f'[::]:{sys.argv[1]}')
     server.start()
-    stop_event.wait()  # Programa waits for the stop_event to be set
+    stop_event.wait()  # Program waits for the stop_event to be set
     server.stop(1)  # Server is stopped with a 1 second grace period after the stop_event is set
 
 
