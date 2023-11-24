@@ -81,7 +81,7 @@ def serve():
     stop_event = threading.Event()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pairs_pb2_grpc.add_CentralServerServicer_to_server(CentralServer(stop_event), server)
-    server.add_insecure_port(f"[::]:{sys.argv[1]}")
+    server.add_insecure_port(f"0.0.0.0:{sys.argv[1]}")
     server.start()
     stop_event.wait()  # Program waits for the stop_event to be set
     server.stop(1)  # Server is stopped with a 1 second grace period after the stop_event is set
